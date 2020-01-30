@@ -1,11 +1,13 @@
 #!/bin/bash
 
-cd ~/ecological-genomics
+cd ~/ecological-genomics/mydata
 
-mkdir fastqc # makes dir if not already exists
+date=$(date +%F)
+dir=fastqc-${date}
+mkdir ${dir} # makes dir if not already exists
 
-for f in /data/project_data/RS_ExomeSeq/fastq/edge_fastq/PRK*
+for f in ${1}*PRK*
 do
-    fastqc ${f} -o fastqc/
+    fastqc ${f} -o ${dir}
 done
 

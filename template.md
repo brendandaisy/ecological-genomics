@@ -64,8 +64,32 @@ Brendan: in charge of all the `PRK` files!!
 ------
 <div id='id-section3'/>
 
-### Entry 3: 2020-2-3 Monday
+### Entry 3: 2020-2-3 Monday.
 
+Info updates with Kerry
 
+Sewall Wright proposed the equation
 
+$N_e = \frac{4 N_m N_f}{N_m + N_f}$
 
+Another option is to estimate expected nucleotide diversity as $\pi =
+4 N_e \mu$, where $\mu$ is the mutation rate per site per generation
+(i.e. bit flip in an EA). (Recall that $\pi$ is defined over pairwise
+SNPs $\pi_ij$ as $\pi = \sum_{ij} x_i x_j \pi_ij$, where $x_i$ is the
+frequency of allele in $i$ in total, and $\pi_ij$ is no. SNPs between
+2 individuals
+
+Usually also interested in estimating $F_{ST}$. Maybe the simplest way
+to do this is $F_{ST} = 1/(\pi +1)$. Another is $1 - H_s/H_t$, where
+$H_s$ is within group heterozygosity, and $H_t$ is total het. in
+population.
+
+The site frequency spectrum is the distribution of the number of
+individuals different from the dominant at each allelle (I.e. a
+histogram of allelles, where each goes into the bin corresp. to no. of
+individuals with the rare nucleotide).
+
+Tajima's D attempts to use $pi$ to understand which alleles are under
+natural selection.
+
+<div id='id-section4'/>

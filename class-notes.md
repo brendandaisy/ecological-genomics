@@ -1,11 +1,7 @@
 
----
-title: "Brendan's Github Notebook"
+--- title: "Brendan's Github Notebook"
 
-output: html_document
-editor_options: 
-chunk_output_type: console
----
+output: html_document editor_options: chunk_output_type: console ---
 
 ## Author: Brendan Case
 ### Affiliation: UVM Computer Science
@@ -20,16 +16,14 @@ chunk_output_type: console
 
 # Table of Contents:
 * [Entry 1: 2020-01-13, Monday](#id-section1)
-* [Entry 2: 2020-01-14, Tuesday](#id-section2)
-------
+* [Entry 2: 2020-01-14, Tuesday](#id-section2) ------
 <div id='id-section1'/>   
 
 ### Entry 1: 2020-01-22, Wednesday.
 
 
 
-------
-<div id='id-section2'/>
+------ <div id='id-section2'/>
 
 ### Entry 2: 2020-01-29, Wednesday.
 
@@ -51,18 +45,19 @@ NACAGAATTAATTTCATGGGAGAGCAAATGTACGTAACTAGGAAAATTTAAAGGGCTGTATGCACCCATATCCTCCTCAT
 #AA<7A-A-AJA--<F--7F---7--<-<----<F----<-7--<<FFJ--<F-<--7--<F7-FJ<AF-A777<<F--<FF<-F--<-7-F-AFF<-F-<A-7-77-7A<F-7<-7<-77F-F<<F<-FFFJ-------)-)))77-AF
 ```
 
-1st line contains metainfo on the sequence and the barcode on the right
+1st line contains metainfo on the sequence and the barcode on the
+right
 
 2nd line is basepairs (N = could be anything)
 
 3rd line is a seperator
 
-4th line is code for the "quality" of each basepair (i.e. was able to read properly), corresponding to a p-value
+4th line is code for the "quality" of each basepair (i.e. was able to
+read properly), corresponding to a p-value
 
 Brendan: in charge of all the `PRK` files!!
 
-------
-<div id='id-section3'/>
+------ <div id='id-section3'/>
 
 ### Entry 3: 2020-2-3 Monday.
 
@@ -93,3 +88,21 @@ Tajima's D attempts to use $pi$ to understand which alleles are under
 natural selection.
 
 <div id='id-section4'/>
+
+### Entry 4: Feb 19th
+
+Folding the SFS: for when the SFS is bimodal and you don't have enough
+ancestry info to resolve whether your reference is ancestral.
+
+There are other applications of SFS foldings as well
+
+#### Estimating the (rough) SFS
+
+Takes SNPs not as ground truth, but RVs with variance.
+
+Starts with SFS as a prior, then calculate $\theta = 4 N_e \mu$ with
+`doTheta` in bash, then use the `ThetaStats` function.
+
+#### TODO: for next time
+
+Update the git repo with all your scripts and results!

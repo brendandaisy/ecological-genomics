@@ -20,4 +20,3 @@ hist(div$tajD)
 barplot(sfs[-1])
 
 summary(div)
-     

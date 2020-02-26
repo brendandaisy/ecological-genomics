@@ -1,4 +1,4 @@
-setwd('c:/Users/brendandaisy/Documents/phd/ecological-genomics/myresults/')
+setwd('c:/Users/brendandaisy/Documents/phd/ecological-genomics/myresults/angsd')
 
 list.files()
 
@@ -14,9 +14,10 @@ colnames(div) <- c('window', 'chrname', 'wincenter', 'tW', 'tP', 'tF', 'tH', 'tL
 div$tWpersite <- div$tW/div$numSites
 div$tPpersite <- div$tP/div$numSites
 
-hist(div$tWpersite)
-hist(div$tPpersite)
-hist(div$tajD)
-barplot(sfs[-1])
+par(mfrow=c(2, 2))
+hist(div$tWpersite, main='Estimated Theta (per site)')
+hist(div$tPpersite, main='Observed Pi (per site)')
+hist(div$tajD, main='Tajima\'s D (per window?)')
+barplot(sfs[-1], main='Site Frequency Spectrum')
 
 summary(div)

@@ -1,0 +1,204 @@
+\documentclass[11pt]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[format=hang,font=small,labelfont=bf]{caption}
+% \usepackage{algorithmicx}
+% \usepackage{algorithm}
+% \usepackage[noend]{algpseudocode}
+% \usepackage{booktabs}
+% \usepackage{mathtools}
+% \usepackage{float}
+% \usepackage{floatpag}
+% \usepackage{comment}
+% \usepackage{cases}
+% \usepackage{mathtools}
+
+%%%%%% PREAMBLE
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\unif}{Unif}
+\DeclareMathOperator*{\bin}{Bin}
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO:
+    #1}\PackageWarning{TODO:}{#1!}}
+
+\newcommand{\N}{\mathbb{N}} % naturals
+\newcommand{\Q}{\mathbb{Q}} % rationals
+\newcommand{\Z}{\mathbb{Z}} % integers
+\newcommand{\R}{\mathbb{R}} % reals
+\newcommand{\ep}{\varepsilon}
+\newcommand{\expect}[1]{\operatorname{\textnormal{\textbf{E}}}\left[#1\right]}
+\newcommand{\prob}[1]{\operatorname{\textnormal{Pr}}\left(#1\right)}
+
+%%%%%% TITLE
+
+\title{Ecological Genomics: Homework \#1}
+\author{Brendan Case\\
+\footnotesize{\texttt{https://github.com/brendandaisy/ecological-genomics}}}
+\date{25 February 2020}
+
+\begin{document}
+\maketitle
+
+\section{Background}
+\label{sec:background}
+
+One common source for genetic differentiation between population of
+the same species is habitat fragmentation, which can lead to founder
+effects and other consequences of population contraction due to a
+reduction in population size and gene flow \cite{Provine2004}. Red
+spruce (\textit{Picea rubens}) is a coniferous tree which has become
+highly isolated since the end of the Pleistocene at the southern end
+of its range, in the higher elevation Appalachian mountains of
+Maryland through North Carolina.
+
+To study the extent of genetic differentiation between these southern
+``island'' populations, we use whole genomic data collected from 340
+mother trees at 65 locations across the tree's range, extracted using
+exome capture sequencing \cite{Jones2016}. For the southern range of
+interest, there were 110 mother trees from 23 populations. For each
+population, this resulted in a forward and reverse strand read from
+several mother trees, stored as \texttt{fastq} files.
+
+\section{Bioinformatics Pipeline}
+\label{sec:bioinf-pipel}
+
+% See Figure \todo{} for a visual summary of the programs and scripts
+% used in our pipeline. 
+To begin our analysis of the sequenced red
+spruce genomes, we performed quality control (QC) on the raw
+reads. Each nucleotide in a fastq file is accompanied by a Phred
+Quality score, which maps a character to the estimated probability the
+assigned base is incorrect. The characters are assigned in
+increasing order of their Unicode representation, so that
+comparing scores between bases is computationally convenient. In
+addition to visual inspection of the fastq files, we used the FastQC
+program to visualize read quality \cite{fastqc}. We then used the
+\texttt{trimmomatic} program to trim our paired reads and improve
+overall quality and aid alignment. Finally, we ran FastQC again on the
+trimmed reads.
+
+Our next step in finding the extent of genetic diversity was to map
+the trimmed reads against a reference genome. We chose as reference a
+genome of the Norway spruce (\textit{Picea abies}), which in 2013 was
+the first gymnosperm ever to be completely sequenced
+\cite{Nystedt2013}. To increase computational efficiency, reduced the
+reference size by only choosing those scaffolds which compliment at
+least one bait from out exome capture. Mapping was performed with
+\texttt{bwa}, while \texttt{sambaba} and \texttt{samtools} were used
+to convert the \texttt{.sam} files to binary, remove PCR duplicates,
+and sort alignments by leftmost coordinates. At this stage we also
+calculated the depth and some basic statistics for each alignment.
+
+The final step in our analysis was calculate the genotype of each
+individual. Due to the large number of individuals and regions in this
+study, the average depth for each alignment was relatively low. Thus,
+we chose to use genotype likelihood methods with ANGSD to obtain a
+more disciplined picture of each individual's genotype
+\cite{Korneliussen2014}. Since the resulting site frequency spectrum
+(SFS) was bimodal, we folded the high-frequency SNPs since these
+genotypes were likely the true ancestral genotype. We then obtained
+our final SFS based on genotype likelihood, and calculated the
+observed average of pairwise differences $\pi$, the estimated global
+mutation rate $\theta$, and Tajima's D test statistic
+\cite{Tajima1989},
+\begin{equation}
+  \label{eq:taj-D}
+  D = \frac{\pi - \theta}{\text{Var}(\pi - \theta)}.
+\end{equation}
+We then compiled the mean of Tajima's D for each site in each
+population, to identify which populations showed evidence of
+undergoing recent
+contraction. % relative intensity to which populations were or were not
+% at equilibrium under the neutral model. 
+
+\section{Results}
+\label{sec:results}
+
+Based on inspection of the FastQC output, the sequenced reads were of
+excellent quality. For the PRK population, after trimming was
+performed, all samples had a confidence interval of Phred quality
+scores well within the 28-40 interval for almost all base positions
+(as determined by the ``Per base sequence quality'' in the FastQC
+output) for both the forward and reverse strands.
+
+Statistics for the sequence alignment against the \textit{P. abies}
+genome can be found in Table \ref{tbl:bamstat}. Each individual had an
+average read depth of around 3-3.8, indicating a relatively low depth
+and justifying our choice for employing genotype likelihood. Figure
+\ref{fig:angsd-results} shows the distribution of the estimated
+$\theta$, average pairwise differences $\pi$, and Tajima's D for the
+PRK population, in addition to the folded SFS. The mean of these
+distributions then gave our global measures of genetic diversity,
+namely, the per site $\theta$ and $\pi$, along with Tajima's D. For
+PRK, these values were $\theta=0.001882$, $\pi=0.0038567$, and
+$D=1.59265$.
+
+\begin{table}
+  \footnotesize
+  \centering
+  \begin{tabular}{*{8}{c}}
+    NumReads & R1 & R2 & Paired & MateMapped & Singletons & MateMappedDiff & AvgDepth\\
+    \hline
+    2051979 & 1024826 & 1027153 & 1283918 & 1869112 & 56137 & 572314 & 3.27\\
+    1989570 & 994197 & 995373 & 1290946 & 1835388 & 46968 & 531000 & 3.30\\
+    2408441 & 1203148 & 1205293 & 1495276 & 2200526 & 64433 & 689130 & 3.54\\
+    2771356 & 1384400 & 1386956 & 1701572 & 2537188 & 71621 & 817970 & 3.81\\
+    1823911 & 911112 & 912799 & 1131078 & 1661130 & 51672 & 518236 & 3.05
+  \end{tabular}
+  \caption{{\footnotesize Results from running samtools \texttt{flagstat} and
+    \texttt{depth} on each sample from the PRK population. Column
+    definitions: NumReads indicates total number of reads. R1/R2 is
+    the number of forward/reverse reads, respectively. Paired is the
+    number of reads which are paired during sequencing. MateMapped is
+    the number of reads which were mapped as a proper pair. Singletons
+    are the number of singleton reads. MateMappedDiff is the number of
+    reads which had a mate mapped to a different chromosome. AvgDepth
+    is the average depth of each read.}}
+\label{tbl:bamstat}
+\end{table}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.6\linewidth]{angsd-results}
+  \caption{Population diversity statistics for the PRK population,
+    calculated with ANGSD. The per site values for $\theta$ and $\pi$
+    were assumed to be the corresponding value for each sequence
+    window, divided the window length. Tajima's D was calculated using
+    the values for $\theta$ and $\pi$ for each window. Bottom right:
+    the folded site frequency spectrum of SNPs for PRK. The first bin
+    of the histogram was removed to allow for comparison for the other
+    much smaller bins.}
+  \label{fig:angsd-results}
+\end{figure}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+Based on our positive value of Tajima's D in all population except
+one, we find there is a genetic signal matching the observed
+contraction in the red spruce's range. However, in spite of our use of
+genotype likelihoods, the relatively low read depth, along with the
+small number of samples per population, reduces the power of the
+Tajima's D test statistic. It is possible that further sampling will
+ultimately decrease the variance in diversity parameters, showing that
+Tajima's D is higher than observed here. Hence, future work should
+seek to corroborate our findings with further sampling, as well as
+explore measures of intra-population diversity such as GWAS.
+
+\newpage
+
+\bibliographystyle{abbrv}
+\bibliography{C:/Users/brendandaisy/Documents/citations/ecological-genomics, ../bibextra}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% 

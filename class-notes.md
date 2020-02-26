@@ -106,3 +106,37 @@ Starts with SFS as a prior, then calculate $\theta = 4 N_e \mu$ with
 #### TODO: for next time
 
 Update the git repo with all your scripts and results!
+
+<div id='id-section5'/>
+
+### Entry 5: Feb 26th
+
+Notes from pipeline: we will be using `Salmon` to get alignment and
+expression counts all at once (easier than getting sam files first),
+and `DESeq2` for visualization and analysis (popular option; also, there
+`EdgeR`.
+
+When processing the Red spruce samples, seedlings were fully ground up
+(roots through needles), so we can't pick up on expression at tissue
+level.
+
+We may remove day 5 from our statistics and only compare days 0 and
+10, since 5 only got 1-4 reps per group.
+
+3' tag sequencing requires very few samples (though need high quality
+RNA). Our lab here is expensive and has some other issues, so common
+to use Cornell's service here.
+
+Part of what makes RNA more volatile is the O-H end on RNA not found
+on DNA.
+
+Fractors/num. levels:
+
+- Treatment (3)
+- SourceClim (2)
+- Time (3)
+
+Questions:
+
+- Do ind from diff climsources have diff gene exp
+- Expression model; exp ~ time + SC + treatment + time x SC + ... + (family as random variable?)

@@ -1,0 +1,176 @@
+\documentclass[11pt]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amsfonts,amssymb}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[format=hang,font=small,labelfont=bf]{caption}
+% \usepackage{algorithmicx}
+% \usepackage{algorithm}
+% \usepackage[noend]{algpseudocode}
+% \usepackage{booktabs}
+% \usepackage{mathtools}
+% \usepackage{float}
+% \usepackage{floatpag}
+% \usepackage{comment}
+% \usepackage{cases}
+% \usepackage{mathtools}
+
+%%%%%% PREAMBLE
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\unif}{Unif}
+\DeclareMathOperator*{\bin}{Bin}
+
+\newcommand{\todo}[1]{\textcolor{red}{TODO:
+    #1}\PackageWarning{TODO:}{#1!}}
+
+\newcommand{\N}{\mathbb{N}} % naturals
+\newcommand{\Q}{\mathbb{Q}} % rationals
+\newcommand{\Z}{\mathbb{Z}} % integers
+\newcommand{\R}{\mathbb{R}} % reals
+\newcommand{\ep}{\varepsilon}
+\newcommand{\expect}[1]{\operatorname{\textnormal{\textbf{E}}}\left[#1\right]}
+\newcommand{\prob}[1]{\operatorname{\textnormal{Pr}}\left(#1\right)}
+
+%%%%%% TITLE
+
+\title{Ecological Genomics: Homework \#2}
+\author{Brendan Case\\
+\footnotesize{\texttt{https://github.com/brendandaisy/ecological-genomics}}}
+\date{27 March 2020}
+
+\begin{document}
+\maketitle
+
+\section{Background}
+\label{sec:background}
+
+Red spruce (\textit{Picea rubens}) is a coniferous tree which has
+become highly isolated due to rising temperatures. While generally
+favoring cold, wet environments, as its range decreases it
+occasionally is forced to inhabit less ideal dry and warm
+environments. It is thus of conservation interest to understand the
+ability of this species to respond to stressful climates.
+
+To study the effect of climate stress on these two ecotypes, we took
+seedlings from both groups and raised them in common garden conditions
+before dividing them into 3 treatment groups: control, heat (\%50
+increase in day/night temperature), and heat$+$drought (temperature
+treatment plus water withholding). We then performed RNA extraction
+from seedling tissue on days 0, 5, and 10 of
+exposure. % (Table \ref{tab:factors}).
+
+% \begin{table}
+%   \centering
+%   \begin{tabular}{l|c|c|c}
+%     Source climate: & Hot + dry & Cool + wet\\
+%     Treatment: & Control & Heat & Heat + drought\\
+%     Day: 
+%   \end{tabular}
+%   \caption{cc}
+%   \label{tab:factors}
+% \end{table}
+
+\section{Bioinformatics Pipeline}
+\label{sec:bioinf-pipel}
+
+Fastq files were inspected for quality using \texttt{fastqc}, then
+trimmed using the Java program \texttt{trimmomatic}. The trimmed reads
+were then mapped to a \textit{P. abies} reference genome using
+Salmon's \texttt{index} command. We then obtained the complete counts
+matrix using Salmon's \texttt{quant} command on each sample, which
+were combined using \texttt{tximport} in R. 
+
+All analyses on the resulting counts matrix were performed using
+\texttt{DESeq2} in R. Briefly, log2 fold changes were found using
+maximum likelihood estimation of the following Negative Binomial GLM:
+\begin{gather*}
+  K_{ij} \sim NB\left(\mu_{ij}, \alpha_i\right)\\
+  \mu_{ij} = s_j q_{ij}\\
+  \log_2(q_{ij}) = x_j\cdot \beta_i,
+\end{gather*}
+where $K_{ij}$ are the observed raw counts for gene $i$ in sample $j$,
+$\mu_{ij}$ is the mean of the negative binomial distribution,
+$\alpha_i$ is a gene-wide dispersion parameter, $s_j$ is a
+sample-specific size factor, and $q_{ij}$ is the expected true
+proportion of gene $i$ out of all expressed genes in sample $j$. The
+log of $q_{ij}$ is given as the sum of fold changes $\beta_{ir}$,
+where $r$ indexes the experimental levels of sample $j$. Hence,
+$\beta_{ir}$ gives the effect of treatment condition $r$ on the
+expression of gene $i$ \cite{Love2014}. In order to have a symmetric
+experimental design and maximize our ability to detect a $G\times E$
+interaction, we used only the day 10 samples, and used
+\texttt{population + treatment + population:treatment} as our
+experimental factors.
+
+\section{Results}
+\label{sec:results}
+
+Among the day 10 samples, we detected expression of different 66,408
+genes. After normalization, there were 7,277 reads per gene on
+average, and a median of 199 reads per gene, suggesting a high amount
+of skew in the level of expression between genes. After filtering out
+genes which on average had less than one read per sample, there were
+17,487 genes with which to perform differential expression analysis.
+
+We found notable differentiation in expression between treatment
+groups. In particular, the PCA shown in Figure \ref{fig:pca}
+revealed different expression levels in the heat + drought
+treatment. However, the first two components did not pick up on
+differences between source climates.
+
+The number of significantly expressed genes for various contrasts was
+computed (not shown). Notably, we found that 559 genes showed a
+significant ``G by E'' interaction; that is, these genes showed
+different responses to either the heat or heat+drought treatment,
+depending on their source climate. Of these genes, 231 were
+exclusively picked up in the climate $\times$ heat interaction, while
+312 genes were exclusively picked up in the climate $\times$ heat +
+drought interaction. Thus, there were only 16 genes with a significant
+non-linear expression between climates and both stress treatments.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.35\linewidth]{pca}
+  \caption{The first two components from a PCA of gene
+    expression. The 3 experimental groups are given different colors,
+    while the shape of replicates corresponds to source climate.}
+  \label{fig:pca}
+\end{figure}
+
+% \begin{table}
+%   \centering
+%   \begin{tabular}{}
+%     Climate & 581\\
+%     Climate X 
+%   \end{tabular}
+%   \caption{cc}
+%   \label{tab:contrasts}
+% \end{table}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We found a number of DE genes between samples from different source
+climates and their response to climate stress. Our results indicate
+that not only are there widespread differences in expression when
+saplings are exposed to both heat and drought stress, but that a
+number of genes may exhibit complex responses to these conditions
+depending on their climate/population of origin. Future work should
+investigate the functional ontology of these genes, as well as
+patterns of gene expression in response to stress over time.
+
+\newpage
+
+\bibliographystyle{abbrv}
+\bibliography{C:/Users/brendandaisy/Documents/citations/ecological-genomics, ../bibextra}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

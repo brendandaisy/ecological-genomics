@@ -140,3 +140,11 @@ Questions:
 
 - Do ind from diff climsources have diff gene exp
 - Expression model; exp ~ time + SC + treatment + time x SC + ... + (family as random variable?)
+
+### Entry 6
+
+Starting with a data table for doing DESeq. The table consists of the
+number of reads which mapped to a certain gene (row), by which fastq
+file the read came from (col).
+
+

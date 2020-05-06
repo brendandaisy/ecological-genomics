@@ -147,4 +147,28 @@ Starting with a data table for doing DESeq. The table consists of the
 number of reads which mapped to a certain gene (row), by which fastq
 file the read came from (col).
 
+### Entry 7
 
+Epigenetics Analysis: Sandra Nnadi.
+
+Slides are on Slack :D
+
+### Entry 8
+
+The plot we are most concerned with in the Bismark summary is the
+M-Bias plot. CpG should theoretically be fairly constant across the
+bases without other evidence, so we can chop off the first few bases
+for example.
+
+.cov file:
+
+```
+LS041563.1	14	14	0	0	1
+LS041563.1	138	138	0	0	1
+LS041563.1	139	139	0	0	1
+LS041563.1	148	148	0	0	1
+LS041563.1	272	272	0	0	1
+```
+
+header is genome, start position, end pos, mythyl percentage, num
+methel C, num unmenthyl C's
